@@ -1,3 +1,2 @@
-function one() {
-    console.log("first work");
-}
+
+console.log("first work");
