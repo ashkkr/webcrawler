@@ -1,5 +1,26 @@
 const { JSDOM } = require('jsdom')
 
+async function crawlWebPage(baseUrl) {
+    try {
+        const resp = await fetch(baseUrl)
+
+        if (resp.status > 399) {
+            console.log(`The status code returned is ${resp.status} for url ${baseUrl}`)
+            return
+        }
+
+        if (!resp.headers.get("content-type").includes("text/html")) {
+            console.log(`The content-type is not html but ${resp.headers.get("content-type")} for url ${baseUrl}`)
+            return
+        }
+
+        console.log(await resp.text())
+    }
+    catch (err) {
+        console.log("error in fetch: " + err.message)
+    }
+}
+
 function getUrlFromHtml(htmlBody, baseUrl) {
     const urls = []
     const dom = new JSDOM(htmlBody)
@@ -43,5 +64,6 @@ function basicCrawler(urlString) {
 
 module.exports = {
     basicCrawler,
-    getUrlFromHtml
+    getUrlFromHtml,
+    crawlWebPage
 }
