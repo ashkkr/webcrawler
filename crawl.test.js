@@ -1,4 +1,4 @@
-const { basicCrawler, getUrlFromHtml } = require("./crawl.js");
+const { normalizeUrl, getUrlFromHtml } = require("./crawl.js");
 const { test, expect } = require("@jest/globals");
 
 

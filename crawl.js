@@ -1,24 +1,48 @@
 const { JSDOM } = require('jsdom')
 
-async function crawlWebPage(baseUrl) {
+async function crawlWebPage(baseUrl, currentUrl, pages) {
+    const baseUrlObj = new URL(baseUrl)
+    const currentUrlObj = new URL(currentUrl)
+
+    if (baseUrlObj.hostname !== currentUrlObj.hostname) {
+        return pages
+    }
+
+    const normalizedCurrentUrl = normalizeUrl(currentUrl)
+
+    if (pages[normalizedCurrentUrl] > 0) {
+        pages[normalizedCurrentUrl]++;
+        return pages
+    }
+
+    pages[normalizedCurrentUrl] = 1
+
+    console.log(`actively crawling ${currentUrl}`)
     try {
-        const resp = await fetch(baseUrl)
+        const resp = await fetch(currentUrl)
 
         if (resp.status > 399) {
-            console.log(`The status code returned is ${resp.status} for url ${baseUrl}`)
-            return
+            console.log(`The status code returned is ${resp.status} for url ${currentUrl}`)
+            return pages
         }
 
         if (!resp.headers.get("content-type").includes("text/html")) {
-            console.log(`The content-type is not html but ${resp.headers.get("content-type")} for url ${baseUrl}`)
-            return
+            console.log(`The content-type is not html but ${resp.headers.get("content-type")} for url ${currentUrl}`)
+            return pages
         }
 
-        console.log(await resp.text())
+        const htmlbody = await resp.text()
+        const nextUrls = getUrlFromHtml(htmlbody, baseUrl)
+
+        for (const nextURl of nextUrls) {
+            pages = await crawlWebPage(baseUrl, nextURl, pages)
+        }
     }
     catch (err) {
         console.log("error in fetch: " + err.message)
     }
+
+    return pages
 }
 
 function getUrlFromHtml(htmlBody, baseUrl) {
@@ -51,7 +75,7 @@ function getUrlFromHtml(htmlBody, baseUrl) {
     return urls
 }
 
-function basicCrawler(urlString) {
+function normalizeUrl(urlString) {
     const url = new URL(urlString)
     const hostname = `${url.hostname}${url.pathname}`
 
@@ -63,7 +87,7 @@ function basicCrawler(urlString) {
 }
 
 module.exports = {
-    basicCrawler,
+    normalizeUrl,
     getUrlFromHtml,
     crawlWebPage
 }
