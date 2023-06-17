@@ -2,23 +2,23 @@ const { normalizeUrl, getUrlFromHtml } = require("./crawl.js");
 const { test, expect } = require("@jest/globals");
 
 
-test("basicCrawler strip url", () => {
+test("normalizeUrl strip url", () => {
     const testString = 'https://blog.boot.dev/path'
-    const actual = basicCrawler(testString)
+    const actual = normalizeUrl(testString)
     const expected = 'blog.boot.dev/path'
     expect(actual).toEqual(expected)
 })
 
-test("basicCrawler to check path", () => {
+test("normalizeUrl to check path", () => {
     const testString = 'https://blog.boot.dev/path/'
-    const actual = basicCrawler(testString)
+    const actual = normalizeUrl(testString)
     const expected = 'blog.boot.dev/path'
     expect(actual).toEqual(expected)
 })
 
-test("basicCrawler capitals", () => {
+test("normalizeUrl capitals", () => {
     const testString = 'https://BLOG.boot.dev/path/'
-    const actual = basicCrawler(testString)
+    const actual = normalizeUrl(testString)
     const expected = 'blog.boot.dev/path'
     expect(actual).toEqual(expected)
 })
